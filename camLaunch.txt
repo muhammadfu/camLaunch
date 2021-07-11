@@ -1,0 +1,38 @@
+import cv2
+import glob
+
+# Script to launch camera and facilitate initial setup of turret platform. Optical center is shown to help ensure there
+# are no horizontal offsets between the pointer laser and the camera as per our assumption for angular transformations.
+# Simply turn on laser and align the optical center and laser horizontally. Vertical offset between optical center and
+# laser point is expected to be ~9 cm. If the two are horizontally aligned and the vertical offset is not as expected,
+# then make sure the motors are at their home position of 90 degrees. If the offset is still not as expected, the laser
+# module has not been attached correctly and should be re-attached.
+
+camON = cv2.VideoCapture(0)
+#fourcc = cv2.VideoWriter_fourcc(*"XVID")
+#cap = cv2.VideoWriter('output.mp4', fourcc, 30, (640, 480))
+
+if camON.isOpened() is False:
+    print("Error launching camera.")
+
+else:
+    cx = 298.34096447
+    cy = 252.40566649
+    optCtr = (int(cx), int(cy))
+    while camON.isOpened():
+        _, frame = camON.read()
+        frame = cv2.circle(frame, optCtr, 4, (0, 128, 255), -1)
+        frame = cv2.putText(frame, "OptCtr", (int(optCtr[0] - 60), int(optCtr[1])), cv2.FONT_HERSHEY_PLAIN,
+                            1, (0, 128, 255), 1)
+
+        #cap.write(frame)
+        cv2.imshow("", frame)
+        stopKey = cv2.waitKey(1)
+        if stopKey == 27:
+            break
+        #if stopKey == 32:
+        #    cv2.imwrite("laser.jpg", frame)
+
+camON.release()
+#cap.release()
+cv2.destroyAllWindows()
